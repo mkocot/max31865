@@ -68,6 +68,16 @@
 #define RTD_A                     3.9083e-3f       /**< rtd a */
 #define RTD_B                     -5.775e-7f       /**< rtd b */
 
+
+/**
+ * @brief helper macros
+ */
+#ifdef DRIVER_MAX31865_WITH_DEBUG_PRINT
+#define DRIVER_MAX31865_DEBUG_PRINT(FMT, ...)  handle->debug_print(FMT, ##__VA_ARGS__)
+#else
+#define DRIVER_MAX31865_DEBUG_PRINT(FMT, ...)  do {} while(0)
+#endif
+
 /**
  * @brief     convert the temperature
  * @param[in] rt raw resistor value
@@ -126,44 +136,46 @@ uint8_t max31865_init(max31865_handle_t *handle)
     {
         return 2;                                                      /* return error */
     }
+#ifdef DRIVER_MAX31865_WITH_DEBUG_PRINT
     if (handle->debug_print == NULL)                                   /* check debug_print */
     {
         return 3;                                                      /* return error */
     }
+#endif
     if (handle->spi_init == NULL)                                      /* check spi_init */
     {
-        handle->debug_print("max31865: spi_init is null.\n");          /* spi_init is null */
+        DRIVER_MAX31865_DEBUG_PRINT("max31865: spi_init is null.\n");  /* spi_init is null */
        
         return 3;                                                      /* return error */
     }
     if (handle->spi_deinit == NULL)                                    /* check spi_init */
     {
-        handle->debug_print("max31865: spi_deinit is null.\n");        /* spi_deinit is null */
+        DRIVER_MAX31865_DEBUG_PRINT("max31865: spi_deinit is null.\n");/* spi_deinit is null */
        
         return 3;                                                      /* return error */
     }
     if (handle->spi_read == NULL)                                      /* check spi_read */
     {
-        handle->debug_print("max31865: spi_read is null.\n");          /* spi_read is null */
+        DRIVER_MAX31865_DEBUG_PRINT("max31865: spi_read is null.\n");  /* spi_read is null */
        
         return 3;                                                      /* return error */
     }
     if (handle->spi_write == NULL)                                     /* check spi_write */
     {
-        handle->debug_print("max31865: spi_write is null.\n");         /* spi_write is null */
+        DRIVER_MAX31865_DEBUG_PRINT("max31865: spi_write is null.\n"); /* spi_write is null */
        
         return 3;                                                      /* return error */
     }
     if (handle->delay_ms == NULL)                                      /* check delay_ms */
     {
-        handle->debug_print("max31865: delay_ms is null.\n");          /* delay_ms is null */
+        DRIVER_MAX31865_DEBUG_PRINT("max31865: delay_ms is null.\n");  /* delay_ms is null */
        
         return 3;                                                      /* return error */
     }
     
     if (handle->spi_init() != 0)                                       /* spi init */
     { 
-        handle->debug_print("max31865: spi init failed.\n");           /* spi init failed */
+        DRIVER_MAX31865_DEBUG_PRINT("max31865: spi init failed.\n");   /* spi init failed */
        
         return 3;                                                      /* return error */
     }
@@ -199,7 +211,7 @@ uint8_t max31865_deinit(max31865_handle_t *handle)
     res = handle->spi_read(MAX31865_REG_CONFIG, (uint8_t *)&prev, 1);                              /* read config */
     if (res != 0)                                                                                  /* check result */
     {
-        handle->debug_print("max31865: read failed.\n");                                           /* read failed */
+        DRIVER_MAX31865_DEBUG_PRINT("max31865: read failed.\n");                                   /* read failed */
         
         return 4;                                                                                  /* return error */
     }
@@ -207,13 +219,13 @@ uint8_t max31865_deinit(max31865_handle_t *handle)
     res = handle->spi_write(MAX31865_REG_CONFIG | WRITE_ADDRESS_MASK, (uint8_t *)&prev, 1);        /* write config */
     if (res != 0)                                                                                  /* check result */
     {
-        handle->debug_print("max31865: write failed.\n");                                          /* write failed */
+        DRIVER_MAX31865_DEBUG_PRINT("max31865: write failed.\n");                                  /* write failed */
         
         return 4;                                                                                  /* return error */
     }
     if (handle->spi_deinit() != 0)                                                                 /* spi deinit */
     {
-        handle->debug_print("max31865: spi deinit failed.\n");                                     /* spi deinit failed */
+        DRIVER_MAX31865_DEBUG_PRINT("max31865: spi deinit failed.\n");                             /* spi deinit failed */
         
         return 1;                                                                                  /* return error */
     }         
@@ -249,7 +261,7 @@ uint8_t max31865_set_filter_select(max31865_handle_t *handle, max31865_filter_se
     res = handle->spi_read(MAX31865_REG_CONFIG, (uint8_t *)&prev, 1);                               /* read config */
     if (res != 0)                                                                                   /* check result */
     {
-        handle->debug_print("max31865: read failed.\n");                                            /* read failed */
+        DRIVER_MAX31865_DEBUG_PRINT("max31865: read failed.\n");                                    /* read failed */
        
         return 1;                                                                                   /* return error */
     }
@@ -286,7 +298,7 @@ uint8_t max31865_get_filter_select(max31865_handle_t *handle, max31865_filter_se
     res = handle->spi_read(MAX31865_REG_CONFIG, (uint8_t *)&prev, 1);        /* read config */
     if (res != 0)                                                            /* check result */
     {
-        handle->debug_print("max31865: read failed.\n");                     /* read failed */
+        DRIVER_MAX31865_DEBUG_PRINT("max31865: read failed.\n");             /* read failed */
        
         return 1;                                                            /* return error */
     }
@@ -323,7 +335,7 @@ uint8_t max31865_set_wire(max31865_handle_t *handle, max31865_wire_t wire)
     res = handle->spi_read(MAX31865_REG_CONFIG, (uint8_t *)&prev, 1);                               /* read config */
     if (res != 0)                                                                                   /* check result */
     {
-        handle->debug_print("max31865: read failed.\n");                                            /* read failed */
+        DRIVER_MAX31865_DEBUG_PRINT("max31865: read failed.\n");                                    /* read failed */
         
         return 1;                                                                                   /* return error */
     }
@@ -360,7 +372,7 @@ uint8_t max31865_get_wire(max31865_handle_t *handle, max31865_wire_t *wire)
     res = handle->spi_read(MAX31865_REG_CONFIG, (uint8_t *)&prev, 1);        /* read config */
     if (res != 0)                                                            /* check result */
     {
-        handle->debug_print("max31865: read failed.\n");                     /* read failed */
+        DRIVER_MAX31865_DEBUG_PRINT("max31865: read failed.\n");             /* read failed */
         
         return 1;                                                            /* return error */
     }
@@ -501,7 +513,7 @@ uint8_t max31865_set_vbias(max31865_handle_t *handle, max31865_bool_t enable)
     res = handle->spi_read(MAX31865_REG_CONFIG, (uint8_t *)&prev, 1);                               /* read config */
     if (res != 0)                                                                                   /* check result */
     {
-        handle->debug_print("max31865: read failed.\n");                                            /* read failed */
+        DRIVER_MAX31865_DEBUG_PRINT("max31865: read failed.\n");                                    /* read failed */
         
         return 1;                                                                                   /* return error */
     }
@@ -538,7 +550,7 @@ uint8_t max31865_get_vbias(max31865_handle_t *handle, max31865_bool_t *enable)
     res = handle->spi_read(MAX31865_REG_CONFIG, (uint8_t *)&prev, 1);        /* read config */
     if (res != 0)                                                            /* check result */
     {
-        handle->debug_print("max31865: read failed.\n");                     /* read failed */
+        DRIVER_MAX31865_DEBUG_PRINT("max31865: read failed.\n");             /* read failed */
         
         return 1;                                                            /* return error */
     }
@@ -574,7 +586,7 @@ uint8_t max31865_clear_fault_status(max31865_handle_t *handle)
     res = handle->spi_read(MAX31865_REG_CONFIG, (uint8_t *)&prev, 1);                               /* read config */
     if (res != 0)                                                                                   /* check result */
     {
-        handle->debug_print("max31865: read failed.\n");                                            /* read failed */
+        DRIVER_MAX31865_DEBUG_PRINT("max31865: read failed.\n");                                    /* read failed */
        
         return 1;                                                                                   /* return error */
     }
@@ -668,7 +680,7 @@ uint8_t max31865_get_high_fault_threshold(max31865_handle_t *handle, uint16_t *t
     res = handle->spi_read(MAX31865_REG_HIGH_FAULT_MSB, (uint8_t *)buf, 2);          /* get fault msb */
     if (res != 0)                                                                    /* check result */
     {
-        handle->debug_print("max31865: read failed.\n");                             /* read failed */
+        DRIVER_MAX31865_DEBUG_PRINT("max31865: read failed.\n");                     /* read failed */
        
         return 1;                                                                    /* return error */
     }
@@ -737,7 +749,7 @@ uint8_t max31865_get_low_fault_threshold(max31865_handle_t *handle, uint16_t *th
     res = handle->spi_read(MAX31865_REG_LOW_FAULT_MSB, (uint8_t *)buf, 2);        /* write low fault msb */
     if (res != 0)                                                                 /* check result */
     {
-        handle->debug_print("max31865: read failed.\n");                          /* read failed */
+        DRIVER_MAX31865_DEBUG_PRINT("max31865: read failed.\n");                  /* read failed */
         
         return 1;                                                                 /* return error */
     }
@@ -774,7 +786,7 @@ uint8_t max31865_set_fault_detection_cycle_control(max31865_handle_t *handle, ma
     res = handle->spi_read(MAX31865_REG_CONFIG, (uint8_t *)&prev, 1);                               /* read config */
     if (res != 0)                                                                                   /* check result */
     {
-        handle->debug_print("max31865: read failed.\n");                                            /* read failed */
+        DRIVER_MAX31865_DEBUG_PRINT("max31865: read failed.\n");                                    /* read failed */
        
         return 1;                                                                                   /* return error */
     }
@@ -811,7 +823,7 @@ uint8_t max31865_get_fault_detection_cycle_control(max31865_handle_t *handle, ma
     res = handle->spi_read(MAX31865_REG_CONFIG, (uint8_t *)&prev, 1);              /* read config */
     if (res != 0)                                                                  /* check result */
     {
-        handle->debug_print("max31865: read failed.\n");                           /* read failed */
+        DRIVER_MAX31865_DEBUG_PRINT("max31865: read failed.\n");                   /* read failed */
        
         return 1;                                                                  /* return error */
     }
@@ -853,7 +865,7 @@ uint8_t max31865_single_read(max31865_handle_t *handle, uint16_t *raw, float *te
     res = handle->spi_read(MAX31865_REG_CONFIG, (uint8_t *)&prev, 1);                                 /* read config */
     if (res != 0)                                                                                     /* check result */
     {
-        handle->debug_print("max31865: read failed.\n");                                              /* read failed */
+        DRIVER_MAX31865_DEBUG_PRINT("max31865: read failed.\n");                                      /* read failed */
        
         return 1;                                                                                     /* return error */
     }
@@ -864,7 +876,7 @@ uint8_t max31865_single_read(max31865_handle_t *handle, uint16_t *raw, float *te
     res = handle->spi_write(MAX31865_REG_CONFIG | WRITE_ADDRESS_MASK, (uint8_t *)&prev, 1);           /* write config */
     if (res != 0)                                                                                     /* check result */
     {
-        handle->debug_print("max31865: write failed.\n");                                             /* write failed */
+        DRIVER_MAX31865_DEBUG_PRINT("max31865: write failed.\n");                                     /* write failed */
        
         return 1;                                                                                     /* return error */
     }
@@ -875,14 +887,14 @@ uint8_t max31865_single_read(max31865_handle_t *handle, uint16_t *raw, float *te
         res = handle->spi_read(MAX31865_REG_CONFIG, (uint8_t *)&prev, 1);                             /* read config */
         if (res != 0)                                                                                 /* check result */
         {
-            handle->debug_print("max31865: read failed.\n");                                          /* read failed */
+            DRIVER_MAX31865_DEBUG_PRINT("max31865: read failed.\n");                                  /* read failed */
            
             return 1;                                                                                 /* return error */
         }
         times--;                                                                                      /* retry times-- */
         if (times == 0)                                                                               /* if retry times == 0 */
         {
-            handle->debug_print("max31865: read timeout.\n");                                         /* read timeout */
+            DRIVER_MAX31865_DEBUG_PRINT("max31865: read timeout.\n");                                 /* read timeout */
            
             return 1;                                                                                 /* return error */
         }
@@ -891,14 +903,14 @@ uint8_t max31865_single_read(max31865_handle_t *handle, uint16_t *raw, float *te
     res = handle->spi_read(MAX31865_REG_RTD_MSB, (uint8_t *)buf, 2);                                  /* read rtd msb */
     if (res != 0)                                                                                     /* check result */
     {
-        handle->debug_print("max31865: read failed.\n");                                              /* read failed */
+        DRIVER_MAX31865_DEBUG_PRINT("max31865: read failed.\n");                                      /* read failed */
        
         return 1;                                                                                     /* return error */
     }
     *raw = (uint16_t)(((uint16_t)buf[0]) << 8) | buf[1];                                              /* get raw data */
     if (((*raw) & 0x01) != 0)
     {
-        handle->debug_print("max31865: find rtd fault.\n");                                           /* find rtd fault */
+        DRIVER_MAX31865_DEBUG_PRINT("max31865: find rtd fault.\n");                                   /* find rtd fault */
        
         return 4;                                                                                     /* return error */
     }
@@ -946,7 +958,7 @@ uint8_t max31865_start_continuous_read(max31865_handle_t *handle)
     res = handle->spi_read(MAX31865_REG_CONFIG, (uint8_t *)&prev, 1);                               /* read config */
     if (res != 0)                                                                                   /* check result */
     {
-        handle->debug_print("max31865: read failed.\n");                                            /* read failed */
+        DRIVER_MAX31865_DEBUG_PRINT("max31865: read failed.\n");                                    /* read failed */
        
         return 1;                                                                                   /* return error */
     }
@@ -984,7 +996,7 @@ uint8_t max31865_stop_continuous_read(max31865_handle_t *handle)
     res = handle->spi_read(MAX31865_REG_CONFIG, (uint8_t *)&prev, 1);                               /* read config */
     if (res != 0)                                                                                   /* check result */
     {
-        handle->debug_print("max31865: read failed.\n");                                            /* read failed */
+        DRIVER_MAX31865_DEBUG_PRINT("max31865: read failed.\n");                                    /* read failed */
        
         return 1;                                                                                   /* return error */
     }
@@ -1028,14 +1040,14 @@ uint8_t max31865_continuous_read(max31865_handle_t *handle, uint16_t *raw, float
     res = handle->spi_read(MAX31865_REG_RTD_MSB, (uint8_t *)buf, 2);                                /* read rtd msb */
     if (res != 0)                                                                                   /* check result */
     {
-        handle->debug_print("max31865: read failed.\n");                                            /* read failed */
+        DRIVER_MAX31865_DEBUG_PRINT("max31865: read failed.\n");                                    /* read failed */
        
         return 1;                                                                                   /* return error */
     }
     *raw = (uint16_t)(((uint16_t)buf[0]) << 8) | buf[1];                                            /* get raw data */
     if (((*raw) & 0x01) != 0)                                                                       /* check error */
     {
-        handle->debug_print("max31865: find rtd fault.\n");                                         /* find rtd fault */
+        DRIVER_MAX31865_DEBUG_PRINT("max31865: find rtd fault.\n");                                 /* find rtd fault */
        
         return 4;                                                                                   /* return error */
     }

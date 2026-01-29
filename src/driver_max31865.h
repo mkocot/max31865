@@ -140,7 +140,9 @@ typedef struct max31865_handle_s
     uint8_t (*spi_read)(uint8_t reg, uint8_t *buf, uint16_t len);         /**< point to a spi_read function address */
     uint8_t (*spi_write)(uint8_t reg, uint8_t *buf, uint16_t len);        /**< point to a spi_write function address */
     void (*delay_ms)(uint32_t ms);                                        /**< point to a delay_ms function address */
+#ifdef DRIVER_MAX31865_WITH_DEBUG_PRINT
     void (*debug_print)(const char *const fmt, ...);                      /**< point to a debug_print function address */
+#endif
     uint8_t inited;                                                       /**< inited flag */
     uint8_t resistor;                                                     /**< resistor type */
     float ref_resistor;                                                   /**< reference resistor value */
@@ -227,7 +229,11 @@ typedef struct max31865_info_s
  * @param[in] FUC pointer to a debug_print function address
  * @note      none
  */
+#ifdef DRIVER_MAX31865_WITH_DEBUG_PRINT
 #define DRIVER_MAX31865_LINK_DEBUG_PRINT(HANDLE, FUC) (HANDLE)->debug_print = FUC
+#else
+#define DRIVER_MAX31865_LINK_DEBUG_PRINT(HANDLE, FUC) do {} while(0)
+#endif
 
 /**
  * @}
