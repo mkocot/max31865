@@ -850,7 +850,6 @@ uint8_t max31865_single_read(max31865_handle_t *handle, uint16_t *raw, float *te
 {
     uint8_t res, prev;
     uint8_t buf[2];
-    float resistor;
     uint16_t times;
     
     if (handle == NULL)                                                                               /* check handle */
@@ -918,6 +917,9 @@ uint8_t max31865_single_read(max31865_handle_t *handle, uint16_t *raw, float *te
     {
         (*raw) = (*raw) >> 1;                                                                         /* get raw data */
     }
+
+#ifdef DRIVER_MAX31865_WITH_FLOAT_OUTPUT
+    float resistor;
     if (handle->resistor == MAX31865_RESISTOR_100PT)                                                  /* if 100PT */
     {
         resistor = 100.0f;                                                                            /* set resistor type 100 */
@@ -927,6 +929,7 @@ uint8_t max31865_single_read(max31865_handle_t *handle, uint16_t *raw, float *te
         resistor = 1000.0f;                                                                           /* set resistor type 1000 */
     }
     *temp = a_max31865_temperature_conversion((float)(*raw), resistor, handle->ref_resistor);         /* calculate temperature */
+#endif
     
     return 0;                                                                                         /* success return 0 */
 }
@@ -1025,7 +1028,6 @@ uint8_t max31865_continuous_read(max31865_handle_t *handle, uint16_t *raw, float
 {
     uint8_t res;
     uint8_t buf[2];
-    float resistor;
     
     if (handle == NULL)                                                                             /* check handle */
     {
@@ -1055,6 +1057,8 @@ uint8_t max31865_continuous_read(max31865_handle_t *handle, uint16_t *raw, float
     {
         (*raw) = (*raw) >> 1;                                                                       /* get raw data */
     }
+#ifdef DRIVER_MAX31865_WITH_FLOAT_OUTPUT
+    float resistor;
     if (handle->resistor == MAX31865_RESISTOR_100PT)                                                /* choose resistor type */
     {
         resistor = 100.0f;                                                                          /* set resistor type 100 */
@@ -1064,6 +1068,7 @@ uint8_t max31865_continuous_read(max31865_handle_t *handle, uint16_t *raw, float
         resistor = 1000.0f;                                                                         /* set resistor type 1000 */
     }
     *temp = a_max31865_temperature_conversion((float)(*raw), resistor, handle->ref_resistor);       /* calculate */
+#endif
     
     return 0;                                                                                       /* success return 0 */
 }
